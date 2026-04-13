@@ -1,0 +1,55 @@
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+         https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <servlet>
+        <servlet-name>AddExpense</servlet-name>
+        <servlet-class>AddExpenseServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddExpense</servlet-name>
+        <url-pattern>/addExpense</url-pattern>
+    </servlet-mapping>
+    <servlet>
+    <servlet-name>GetExpensesServlet</servlet-name>
+    <servlet-class>GetExpensesServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>GetExpensesServlet</servlet-name>
+    <url-pattern>/getExpenses</url-pattern>
+</servlet-mapping>
+<servlet>
+    <servlet-name>DeleteExpenseServlet</servlet-name>
+    <servlet-class>DeleteExpenseServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>DeleteExpenseServlet</servlet-name>
+    <url-pattern>/deleteExpense</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>UpdateExpenseServlet</servlet-name>
+    <servlet-class>UpdateExpenseServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>UpdateExpenseServlet</servlet-name>
+    <url-pattern>/updateExpense</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>LoginServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login</url-pattern>
+</servlet-mapping>
+
+</web-app>

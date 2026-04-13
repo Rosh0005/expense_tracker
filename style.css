@@ -1,0 +1,27 @@
+*{
+    padding: 0;
+}
+.add {
+    height:150px;
+    background-color: palevioletred;
+    padding-left: 20px;
+}
+button{
+    height: 30px;
+    width: 80px;
+}
+#TE,#avg, #TC {
+    height: 100px;
+    width: 200px;
+    background-color: aqua;
+    display: inline-block;
+    margin-right: 200PX;
+}
+ 
+#total {
+    
+        display: inline-block;
+        background-color: blueviolet;
+         height: 100px;
+        width: 100px;
+    }

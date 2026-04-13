@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #111; }
+  .page { padding: 2rem 1.5rem; max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 32px; font-weight: 600; }
+  .subtitle { font-size: 14px; color: #666; margin-top: 4px; margin-bottom: 1.5rem; }
+  .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+
+  /* Form */
+  .form-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+  .form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+  .form-group input, .form-group select {
+    width: 100%; height: 40px; padding: 0 10px;
+    border: 1px solid #ddd; border-radius: 8px;
+    background: #fff; color: #111; font-size: 14px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: #888; }
+  .add-btn {
+    height: 40px; padding: 0 22px;
+    background: #111; color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: #333; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .stat-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1rem 1.25rem; }
+  .stat-label { font-size: 13px; color: #888; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 600; color: #111; }
+
+  /* Category grid */
+  .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .cat-card { border-radius: 10px; padding: 0.75rem 1rem; }
+  .cat-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .cat-amount { font-size: 16px; font-weight: 600; }
+
+  .cat-food        { background: #FEF3EB; } .cat-food .cat-name, .cat-food .cat-amount { color: #B35B1A; }
+  .cat-transport   { background: #EBF3FE; } .cat-transport .cat-name, .cat-transport .cat-amount { color: #1A5BA8; }
+  .cat-shopping    { background: #F2EBFE; } .cat-shopping .cat-name, .cat-shopping .cat-amount { color: #6A1AB3; }
+  .cat-entertainment { background: #FEEBF5; } .cat-entertainment .cat-name, .cat-entertainment .cat-amount { color: #B31A70; }
+  .cat-bills       { background: #FEEBEB; } .cat-bills .cat-name, .cat-bills .cat-amount { color: #A31A1A; }
+  .cat-health      { background: #EBFEF3; } .cat-health .cat-name, .cat-health .cat-amount { color: #0F6E3A; }
+  .cat-other       { background: #F0F0F0; } .cat-other .cat-name { color: #555; } .cat-other .cat-amount { color: #111; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead tr { border-bottom: 1px solid #eee; }
+  th { text-align: left; font-size: 13px; font-weight: 600; color: #111; padding: 0.5rem 0.75rem; }
+  td { padding: 0.8rem 0.75rem; color: #111; border-bottom: 1px solid #f0f0f0; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+
+  /* Badges */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .badge-food          { background: #FEF3EB; color: #B35B1A; }
+  .badge-transport     { background: #EBF3FE; color: #1A5BA8; }
+  .badge-shopping      { background: #F2EBFE; color: #6A1AB3; }
+  .badge-entertainment { background: #FEEBF5; color: #B31A70; }
+  .badge-bills         { background: #FEEBEB; color: #A31A1A; }
+  .badge-health        { background: #EBFEF3; color: #0F6E3A; }
+  .badge-other         { background: #F0F0F0;  color: #555; }
+
+  /* Delete button */
+  .del-btn {
+    background: none; border: none; cursor: pointer;
+    color: #bbb; padding: 4px 8px; border-radius: 6px;
+    font-size: 15px; transition: color 0.15s, background 0.15s;
+  }
+  .del-btn:hover { color: #c00; background: #feebeb; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #fff; border: 1px solid #e5e5e5; border-radius: 10px;
+    padding: 10px 18px; font-size: 14px; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1); opacity: 0;
+    transition: opacity 0.25s; pointer-events: none; z-index: 999;
+  }
+  .toast.show { opacity: 1; pointer-events: auto; }
+  .toast-icon { color: #22a85a; font-size: 16px; }
+
+  /* Empty state */
+  .empty { text-align: center; color: #aaa; padding: 2rem; font-size: 14px; }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .form-row { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .cat-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1>Expenses</h1>
+  <p class="subtitle">Track and manage your spending</p>
+
+  <!-- Add Expense -->
+  <div class="card">
+    <div class="card-title">Add Expense</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="cat-select">
+          <option value="Food & Dining">Food & Dining</option>
+          <option value="Transportation">Transportation</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Bills & Utilities">Bills & Utilities</option>
+          <option value="Healthcare">Healthcare & Medicines</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="date-input">
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="time-input">
+      </div>
+      <div class="form-group">
+        <label>Amount</label>
+        <input type="number" id="amount-input" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <button class="add-btn" onclick="addExpense()">+ Add</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Expenses</div><div class="stat-value" id="total">$0.00</div></div>
+    <div class="stat-card"><div class="stat-label">Transactions</div><div class="stat-value" id="txn-count">0</div></div>
+    <div class="stat-card"><div class="stat-label">Average</div><div class="stat-value" id="avg">$0.00</div></div>
+    <div class="stat-card"><div class="stat-label">Top Category</div><div class="stat-value" id="top-cat" style="font-size:15px">—</div></div>
+  </div>
+
+  <!-- By Category -->
+  <div class="card">
+    <div class="card-title">By Category</div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+
+  <!-- Recent Expenses -->
+  <div class="card">
+    <div class="card-title">Recent Expenses</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="expense-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script>
+  const CATEGORIES = [
+    { key: 'Food & Dining', cls: 'food' },
+    { key: 'Transportation', cls: 'transport' },
+    { key: 'Shopping', cls: 'shopping' },
+    { key: 'Entertainment', cls: 'entertainment' },
+    { key: 'Bills & Utilities', cls: 'bills' },
+    { key: 'Healthcare', cls: 'health' },
+    { key: 'Other', cls: 'other' }
+  ];
+
+  // ✅ NO dummy data
+  let expenses = [];
+
+  // ─── Helpers ─────────────────────────────────
+
+  function catClass(cat) {
+    const found = CATEGORIES.find(c => c.key === cat);
+    return found ? found.cls : 'other';
+  }
+
+  function fmt(n) {
+    return '₹' + n.toFixed(2);   // ✅ Rs instead of $
+  }
+
+  function formatDate(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // ─── LOAD FROM DB ────────────────────────────
+
+  function loadExpenses() {
+    fetch("/expense-tracker/getExpenses")
+      .then(res => res.json())
+      .then(data => {
+        expenses = data;
+        render();
+      })
+      .catch(err => console.error("Error loading data:", err));
+  }
+
+  // ─── ADD EXPENSE ─────────────────────────────
+
+ function addExpense() {
+  let category = document.getElementById("cat-select").value;
+  let date = document.getElementById("date-input").value;
+  let time = document.getElementById("time-input").value;
+  let amount = document.getElementById("amount-input").value;
+
+  let url = "/expense-tracker/addExpense";
+  let body = `category=${category}&date=${date}&time=${time}&amount=${amount}`;
+
+  // ✅ IF editing → change URL
+  if (editId !== null) {
+    url = "/expense-tracker/updateExpense";
+    body += `&id=${editId}`;
+  }
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: body
+  })
+  .then(() => {
+    loadExpenses();
+    showToast(editId ? "Updated!" : "Added!");
+
+    editId = null;  // ✅ reset after update
+
+    document.getElementById("amount-input").value = "";
+  })
+  .catch(err => console.error(err));
+}
+ 
+let editId = null;
+function editExpense(id) {
+  const exp = expenses.find(e => e.id === id);
+
+  document.getElementById("cat-select").value = exp.category;
+  document.getElementById("date-input").value = exp.date;
+  document.getElementById("time-input").value = exp.time;
+  document.getElementById("amount-input").value = exp.amount;
+
+  editId = id;  // ✅ THIS is the key
+}
+
+  // ─── DELETE (frontend only for now) ──────────
+
+  function deleteExpense(id) {
+  fetch(`/expense-tracker/deleteExpense?id=${id}`)
+    .then(res => res.text())
+    .then(() => {
+      loadExpenses();   // reload from DB
+      showToast("Deleted successfully!");
+    })
+    .catch(err => console.error("Delete error:", err));
+}
+
+  // ─── RENDER ─────────────────────────────────
+
+  function render() {
+    renderStats();
+    renderCategoryGrid();
+    renderTable();
+  }
+
+  function renderStats() {
+    const total = expenses.reduce((s, e) => s + e.amount, 0);
+    const avg = expenses.length ? total / expenses.length : 0;
+
+    const bycat = {};
+    expenses.forEach(e => { bycat[e.category] = (bycat[e.category] || 0) + e.amount; });
+
+    let topCat = '—', topAmt = -1;
+    Object.entries(bycat).forEach(([k, v]) => {
+      if (v > topAmt) { topAmt = v; topCat = k; }
+    });
+
+    document.getElementById('total').textContent = fmt(total);
+    document.getElementById('txn-count').textContent = expenses.length;
+    document.getElementById('avg').textContent = fmt(avg);
+    document.getElementById('top-cat').textContent = topAmt > 0 ? topCat : '—';
+  }
+
+  function renderCategoryGrid() {
+    const bycat = {};
+    CATEGORIES.forEach(c => { bycat[c.key] = 0; });
+    expenses.forEach(e => { bycat[e.category] = (bycat[e.category] || 0) + e.amount; });
+
+    const grid = document.getElementById('cat-grid');
+    grid.innerHTML = CATEGORIES.map(c => `
+      <div class="cat-card cat-${c.cls}">
+        <div class="cat-name">${c.key}</div>
+        <div class="cat-amount">${fmt(bycat[c.key] || 0)}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('expense-tbody');
+
+    if (expenses.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" class="empty">No expenses yet. Add one above!</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = expenses.map(e => {
+      const cls = catClass(e.category);
+      return `
+        <tr>
+          <td><span class="badge badge-${cls}">${e.category}</span></td>
+          <td>${formatDate(e.date)}</td>
+          <td>${e.time}</td>
+          <td><strong>${fmt(e.amount)}</strong></td>
+          <button onclick="editExpense(${e.id})">✏️</button>
+          <td><button class="del-btn" onclick="deleteExpense(${e.id})">🗑</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // ─── INIT ───────────────────────────────────
+
+  (function init() {
+    const now = new Date();
+    document.getElementById('date-input').value = now.toISOString().split('T')[0];
+    document.getElementById('time-input').value = now.toTimeString().slice(0, 5);
+
+    document.getElementById('amount-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') addExpense();
+    });
+
+    loadExpenses();  // ✅ IMPORTANT
+  })();
+</script>
+
+</body>
+</html>
