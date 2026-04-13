@@ -15,13 +15,15 @@ A full-stack web application to manage daily expenses.
 - Server: Apache Tomcat
 - Database: MySQL
 
-## Screenshots
-### Login
-<img width="400" alt="login" src="https://github.com/user-attachments/assets/bdb73ba1-8257-4b60-ad4a-21714c11d8eb" />
+## 📸 Screenshots
+### Login Page
+<img src="https://github.com/user-attachments/assets/bdb73ba1-8257-4b60-ad4a-21714c11d8eb" width="400"/>
+
 ### Dashboard
-<img width="800" alt="dashboard" src="https://github.com/user-attachments/assets/04a86a87-3d7e-4924-bad9-7afac0607841" />
+<img src="https://github.com/user-attachments/assets/04a86a87-3d7e-4924-bad9-7afac0607841" width="800"/>
+
 ### Recent Expenses Table
-<img width="400" alt="data" src="https://github.com/user-attachments/assets/8434433b-9c8d-4ddb-9af4-33652eb15414" />
+<img src="https://github.com/user-attachments/assets/8434433b-9c8d-4ddb-9af4-33652eb15414" width="500"/>
 
 ##  How to Run
 1. Install Tomcat
